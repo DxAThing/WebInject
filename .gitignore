@@ -14,3 +14,7 @@ node_modules/
 # Data management
 Dataset/data/*
 !Dataset/data/icc_profiles/
+
+# Training data (LMDB, checkpoints, etc.)
+Training/data/
+Training/checkpoints/
