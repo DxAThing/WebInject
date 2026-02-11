@@ -1,6 +1,6 @@
 __pycache__/
 *.py[cod]
-*$py.class
+*.class
 *.log
 .vscode/
 .idea/
@@ -10,5 +10,7 @@ env/
 node_modules/
 *.csv
 *.xlsx
-Dataset/data/logs/
-Dataset/data/driver/Driver_Notes/
+
+# Data management
+Dataset/data/*
+!Dataset/data/icc_profiles/
