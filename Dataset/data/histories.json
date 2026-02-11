@@ -1,0 +1,106 @@
+{
+  "shadow_histories": [
+    [
+      "click((598, 394))",
+      "wait()",
+      "left_double((576, 707))"
+    ],
+    [
+      "wait()",
+      "click((1882, 1060))",
+      "call_user()"
+    ],
+    [
+      "left_double((1647, 775))",
+      "left_double((265, 424))",
+      "drag((567, 401), (138, 859))"
+    ],
+    [
+      "finished()",
+      "click((480, 1062))",
+      "wait()"
+    ],
+    [
+      "hotkey(ctrl+z)",
+      "drag((555, 884), (340, 692))",
+      "right_single((877, 213))"
+    ],
+    [
+      "click((1038, 289))",
+      "scroll(up)",
+      "finished()"
+    ],
+    [
+      "drag((972, 107), (647, 159))",
+      "call_user()",
+      "scroll(down)"
+    ],
+    [
+      "finished()",
+      "call_user()",
+      "scroll(down)"
+    ],
+    [
+      "finished()",
+      "call_user()",
+      "right_single((603, 98))"
+    ],
+    [
+      "wait()",
+      "right_single((1732, 171))",
+      "click((837, 406))"
+    ]
+  ],
+  "user_histories": [
+    [
+      "call_user()",
+      "type(\"kmrnuiho\")",
+      "scroll(right)"
+    ],
+    [
+      "hotkey(escape)",
+      "click((555, 114))",
+      "call_user()"
+    ],
+    [
+      "call_user()",
+      "finished()",
+      "finished()"
+    ],
+    [
+      "right_single((234, 725))",
+      "scroll(right)",
+      "finished()"
+    ],
+    [
+      "call_user()",
+      "finished()",
+      "click((1810, 273))"
+    ],
+    [
+      "finished()",
+      "right_single((642, 947))",
+      "finished()"
+    ],
+    [
+      "type(\"8sfv4ucr\")",
+      "wait()",
+      "hotkey(ctrl+z)"
+    ],
+    [
+      "call_user()",
+      "right_single((391, 950))",
+      "finished()"
+    ],
+    [
+      "scroll(right)",
+      "finished()",
+      "finished()"
+    ],
+    [
+      "left_double((457, 209))",
+      "click((742, 403))",
+      "right_single((1458, 805))"
+    ]
+  ]
+}

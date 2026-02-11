@@ -1,0 +1,35 @@
+# WebInject 数据集制备流水线 - 依赖包列表
+# ============================================================
+
+# 图像处理
+Pillow>=12.0.0
+
+# 网页自动化和浏览器控制
+selenium>=4.0.0
+webdriver-manager>=4.0.0
+
+# 数学和数据处理
+numpy>=1.20.0
+
+# HTTP 请求与 HTML 解析（爬虫 DuckDuckGo 搜索）
+requests>=2.28.0
+beautifulsoup4>=4.12.0
+
+# Google 搜索（可选，已被 DuckDuckGo 替代，保留兼容）
+googlesearch-python>=1.2.0
+
+# OpenAI API（合成网页生成，Mock 模式下无需）
+openai>=1.0.0
+
+# 注：以下为 Python 标准库，无需安装
+# - os
+# - json
+# - traceback
+# - io
+# - base64
+# - random
+# - string
+# - ast
+
+# 注：真实网页采集还需要 Node.js 工具 single-file-cli
+# 安装方式: npm install -g single-file-cli

@@ -1,0 +1,52 @@
+{
+  "completed_phases": [
+    "phase0_crawl",
+    "phase1_synth",
+    "phase2_prompts",
+    "phase3_history",
+    "phase4_render",
+    "phase5_metadata"
+  ],
+  "phase_data": {
+    "phase0_crawl": {
+      "Blog": {
+        "success": 10,
+        "fail": 0
+      },
+      "Commerce": {
+        "success": 10,
+        "fail": 0
+      },
+      "Education": {
+        "success": 9,
+        "fail": 1
+      },
+      "Healthcare": {
+        "success": 8,
+        "fail": 2
+      },
+      "Portfolio": {
+        "success": 10,
+        "fail": 0
+      }
+    },
+    "phase1_synth": {
+      "skipped": true
+    },
+    "phase2_prompts": {
+      "count": 47
+    },
+    "phase3_history": {
+      "shadow_count": 10,
+      "user_count": 10
+    },
+    "phase4_render": {
+      "icc_count": 94,
+      "raw_count": 94
+    },
+    "phase5_metadata": {
+      "total_html": 47,
+      "total_screenshots": 94
+    }
+  }
+}
