@@ -2,18 +2,18 @@
 # webpage_manager.py — 网页管理：合成生成 + 文件工具
 # ============================================================
 # 功能：
-#   1. 调用 OpenAI GPT-4 / Mock 生成合成 HTML 页面
+#   1. 调用本地大模型生成合成 HTML 页面（替代 OpenAI API）
 #   2. 提供 list_html_files / load_html 等文件级工具函数
 #   3. 支持断点续传（已存在的文件自动跳过）
 # ============================================================
 
 import os
 import glob
-from typing import Optional
 
 import config
 
 # ---------------------- 论文原文 Prompt ----------------------
+# 用于指导本地大模型生成逼真的合成网页
 SYNTHETIC_PROMPT = (
     "Generate a highly realistic HTML page for a {category} website. "
     "Include detailed and modern HTML and CSS directly in the file, "
@@ -25,25 +25,39 @@ SYNTHETIC_PROMPT = (
     "explanations, or surrounding code blocks like '```html'."
 )
 
+# 系统提示：限定大模型的输出格式
+SYNTHETIC_SYSTEM_PROMPT = (
+    "You are an expert web developer. You only output raw HTML code. "
+    "Do not include any markdown formatting, code fences, or explanations. "
+    "Output the complete HTML document starting with <!DOCTYPE html>."
+)
+
 
 # ============================================================
-# OpenAI API 调用
+# 本地大模型调用生成 HTML
 # ============================================================
-def _call_openai(prompt: str) -> str:
-    """调用 OpenAI Chat Completion API 生成 HTML。"""
+def _call_local_llm(prompt: str) -> str:
+    """
+    调用本地大模型生成 HTML 内容。
+    替代原有的 OpenAI API 调用。
+
+    参数:
+        prompt : 生成提示文本
+
+    返回:
+        生成的 HTML 字符串（已清理代码围栏标记）
+    """
     try:
-        from openai import OpenAI
+        import local_llm
 
-        client = OpenAI(api_key=config.OPENAI_API_KEY)
-        response = client.chat.completions.create(
-            model=config.OPENAI_MODEL,
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0.7,
-            max_tokens=4096,
+        response = local_llm.generate(
+            prompt=prompt,
+            system_prompt=SYNTHETIC_SYSTEM_PROMPT,
         )
-        raw = response.choices[0].message.content
-        content = raw.strip() if raw else ""
 
+        content = response.strip()
+
+        # 清理可能残留的 markdown 代码围栏
         if content.startswith("```html"):
             content = content[len("```html"):].strip()
         if content.startswith("```"):
@@ -53,11 +67,8 @@ def _call_openai(prompt: str) -> str:
 
         return content
 
-    except ImportError:
-        print("[SyntheticGen] [WARN] openai 库未安装，请运行: pip install openai")
-        return ""
     except Exception as e:
-        print(f"[SyntheticGen] [FAIL] OpenAI API 调用失败: {e}")
+        print(f"[SyntheticGen] [FAIL] 本地大模型调用失败: {e}")
         return ""
 
 
@@ -65,7 +76,10 @@ def _call_openai(prompt: str) -> str:
 # Mock HTML 生成（含 CSS Grid / Flexbox）
 # ============================================================
 def _generate_mock_html(category: str, index: int) -> str:
-    """生成一个含 CSS Grid 布局的 Mock HTML 页面。"""
+    """
+    生成一个含 CSS Grid 布局的 Mock HTML 页面。
+    用于本地大模型不可用时的后备方案。
+    """
     color_themes = {
         "Blog": ("#1a1a2e", "#16213e", "#0f3460", "#e94560"),
         "Commerce": ("#2d3436", "#636e72", "#00b894", "#fdcb6e"),
@@ -282,17 +296,20 @@ def _generate_mock_html(category: str, index: int) -> str:
 # ============================================================
 # 单页面生成
 # ============================================================
-def generate_one(category: str, index: int, use_mock: Optional[bool] = None) -> str:
+def generate_one(category: str, index: int) -> str:
     """
     生成一个合成 HTML 页面并保存到磁盘。
-    如果目标文件已存在则跳过（断点续传）。
+    优先使用本地大模型，失败时回退到 Mock 模板。
+
+    断点续传：如果目标文件已存在且大于 100 字节则跳过。
+
+    参数:
+        category : 网页类别（Blog/Commerce/Education/Healthcare/Portfolio）
+        index    : 页面序号（从 0 开始）
 
     返回:
         保存后的文件绝对路径
     """
-    if use_mock is None:
-        use_mock = config.USE_MOCK
-
     category_dir = os.path.join(config.RAW_HTML_DIR, category)
     os.makedirs(category_dir, exist_ok=True)
 
@@ -304,17 +321,17 @@ def generate_one(category: str, index: int, use_mock: Optional[bool] = None) -> 
         print(f"[SyntheticGen] [SKIP] 已存在: {filename}")
         return filepath
 
-    if use_mock:
-        html_content = _generate_mock_html(category, index)
-        print(f"[SyntheticGen] Mock 生成: {category} #{index + 1}")
+    # 尝试使用本地大模型生成
+    prompt = SYNTHETIC_PROMPT.format(category=category)
+    html_content = _call_local_llm(prompt)
+
+    if html_content and html_content.strip().startswith("<!DOCTYPE") or \
+       html_content and html_content.strip().startswith("<html"):
+        print(f"[SyntheticGen] 本地大模型生成成功: {category} #{index + 1}")
     else:
-        prompt = SYNTHETIC_PROMPT.format(category=category)
-        html_content = _call_openai(prompt)
-        if not html_content:
-            print(f"[SyntheticGen] API 返回空，回退 Mock: {category} #{index + 1}")
-            html_content = _generate_mock_html(category, index)
-        else:
-            print(f"[SyntheticGen] API 生成成功: {category} #{index + 1}")
+        # 大模型生成失败或输出格式不对，回退到 Mock
+        print(f"[SyntheticGen] 本地大模型输出不合法，回退 Mock: {category} #{index + 1}")
+        html_content = _generate_mock_html(category, index)
 
     with open(filepath, "w", encoding="utf-8") as f:
         f.write(html_content)

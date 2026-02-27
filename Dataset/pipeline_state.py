@@ -3,6 +3,11 @@
 # ============================================================
 # 使用 JSON 文件持久化每个 Phase 的完成状态，
 # 重新运行时自动跳过已完成的阶段。
+#
+# 云端抢占式实例随时可能中断，此模块确保：
+#   - 每个阶段完成后立即持久化状态
+#   - 重启后自动从上次中断处继续
+#   - 支持手动重置状态文件
 # ============================================================
 
 import json
@@ -16,7 +21,7 @@ PHASES = [
     "phase1_synth",       # 合成网页生成
     "phase2_prompts",     # Prompt 生成
     "phase3_history",     # 历史生成
-    "phase4_render",      # 渲染模拟
+    "phase4_render",      # 渲染截图
     "phase5_metadata",    # 元数据汇总
 ]
 
@@ -30,6 +35,11 @@ def load_state() -> dict:
           "completed_phases": ["phase0_crawl", ...],
           "phase_data": {<phase_name>: <any serializable data>}
         }
+
+    断点续传核心逻辑：
+      - 如果状态文件存在且合法，加载并返回
+      - 如果状态文件损坏，打印警告并返回空状态（重新开始）
+      - 如果状态文件不存在，返回空状态
     """
     if os.path.exists(config.PIPELINE_STATE_FILE):
         try:
@@ -47,7 +57,10 @@ def load_state() -> dict:
 
 
 def save_state(state: dict):
-    """将流水线状态保存到磁盘。"""
+    """
+    将流水线状态保存到磁盘。
+    每次阶段完成后必须调用，确保中断后可恢复。
+    """
     os.makedirs(os.path.dirname(config.PIPELINE_STATE_FILE), exist_ok=True)
     with open(config.PIPELINE_STATE_FILE, "w", encoding="utf-8") as f:
         json.dump(state, f, ensure_ascii=False, indent=2)
@@ -55,7 +68,7 @@ def save_state(state: dict):
 
 def mark_completed(state: dict, phase_name: str, phase_data=None):
     """
-    标记一个阶段为已完成，并持久化。
+    标记一个阶段为已完成，并立即持久化到磁盘。
 
     参数:
         state      : 当前状态 dict
@@ -76,7 +89,7 @@ def is_completed(state: dict, phase_name: str) -> bool:
 
 
 def reset_state():
-    """重置流水线状态（删除状态文件）。"""
+    """重置流水线状态（删除状态文件），从头开始。"""
     if os.path.exists(config.PIPELINE_STATE_FILE):
         os.remove(config.PIPELINE_STATE_FILE)
         print("[State] 流水线状态已重置")

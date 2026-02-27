@@ -1,0 +1,31 @@
+# WebInject Attack — 云端攻击流水线依赖
+# ============================================================
+
+# 深度学习框架 (CUDA 12.6)
+# 请使用以下命令安装 CUDA 版本:
+#   pip install torch torchvision --index-url https://download.pytorch.org/whl/cu126
+torch>=2.0.0
+torchvision>=0.15.0
+
+# Transformer 模型 (Qwen2.5-VL 等多模态模型)
+transformers>=4.40.0
+accelerate>=0.30.0
+
+# Qwen2.5-VL 图像预处理 (必需)
+qwen-vl-utils>=0.0.8
+
+# HuggingFace Hub (模型下载 + 多线程加速)
+huggingface-hub>=0.20.0
+hf_transfer>=0.1.4
+
+# 高性能键值数据库 (LMDB 二进制打包)
+lmdb>=1.4.0
+
+# 图像处理
+Pillow>=10.0.0
+
+# 数值计算
+numpy>=1.20.0
+
+# 进度条
+tqdm>=4.60.0

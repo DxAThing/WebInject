@@ -10,11 +10,41 @@ env/
 node_modules/
 *.csv
 *.xlsx
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+*.bin
+*.zip
+*.tar
+*.tar.gz
+*.7z
 
 # Data management
 Dataset/data/*
-!Dataset/data/icc_profiles/
+
+# Attack pipeline generated data
+Attack/data/
+Attack/**/logs/
+Attack/**/screenshots/
+Attack/**/raw_html/
+Attack/**/cloud_output/
+
+# Dataset generated artifacts
+Dataset/raw_html/
+Dataset/screenshots/
+Dataset/logs/
+Dataset/**/logs/
+Dataset/**/raw_html/
+Dataset/**/cloud_output/
 
 # Training data (LMDB, checkpoints, etc.)
 Training/data/
 Training/checkpoints/
+
+# Common database/cache artifacts
+*.mdb
+*.lmdb/
+*.sqlite
+*.sqlite3
+*.db
